@@ -18,7 +18,7 @@ abstract class BaseParser extends Command
             return;
         }
 
-        echo ('<info>' . $message . '</info>' . PHP_EOL);
+        echo ($message . PHP_EOL);
     }
 
     protected function downloadWithCURL($url)
