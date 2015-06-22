@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Http\Parsers\ParserAutobanBy;
+use App\Http\Parsers\ParserAvtomarketRu;
 use Illuminate\Console\Command;
 
 class Parsing extends Command
@@ -36,8 +38,27 @@ class Parsing extends Command
      */
     public function handle()
     {
-        $this->info('Starting parsing ' . $this->option('service') . '...');
+        $service = $this->option('service');
+        $parser = null;
+        $parser = $this->parserCreation($service);
 
-        $this->info('Ended parsing of ' . $this->option('service') . '.');
+        if (!empty($parser)) {
+            $this->info('Starting parsing ' . $this->option('service') . '...');
+            $parser->parse();
+            $this->info('Ended parsing of ' . $this->option('service') . '.');
+        } else {
+            $this->info('Parser stopped even not having begun.');
+        }
+    }
+
+    protected function parserCreation($service)
+    {
+        if ($service === 'avtomarket.ru') {
+            return new ParserAvtomarketRu();
+        } elseif ($service === 'autoban.by') {
+            return new ParserAutobanBy();
+        }
+
+        return null;
     }
 }
