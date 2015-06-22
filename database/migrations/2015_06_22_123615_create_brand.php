@@ -19,6 +19,8 @@ class CreateBrand extends Migration
             $table->text('name');
             $table->timestamps();
         });
+
+        DB::statement('ALTER TABLE brand ADD UNIQUE brand_name_unique(name(100))');
     }
 
     /**

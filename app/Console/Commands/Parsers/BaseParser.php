@@ -11,6 +11,16 @@ abstract class BaseParser extends Command
     protected $catalogURL;
     protected $pageEncoding;
 
+    public function info($message)
+    {
+        if (!is_string($message)) {
+            echo 'Non string.' . PHP_EOL;
+            return;
+        }
+
+        echo ('<info>' . $message . '</info>' . PHP_EOL);
+    }
+
     protected function downloadWithCURL($url)
     {
         $c = curl_init($url);
