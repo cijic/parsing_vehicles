@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "cf679a7558a4b211b689961b789796a5",
+    "hash": "48a215eef13d23ca32f828dad0e99e7b",
     "packages": [
         {
             "name": "barryvdh/laravel-ide-helper",
@@ -1912,6 +1912,46 @@
                 "environment"
             ],
             "time": "2015-05-30 15:59:26"
+        },
+        {
+            "name": "yangqi/htmldom",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yangqi/Htmldom.git",
+                "reference": "048b36308ab6a6b448f9be1f089ecc7cf61e8ed2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yangqi/Htmldom/zipball/048b36308ab6a6b448f9be1f089ecc7cf61e8ed2",
+                "reference": "048b36308ab6a6b448f9be1f089ecc7cf61e8ed2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Yangqi\\Htmldom": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "yangqi",
+                    "email": "i@yangqi.me"
+                }
+            ],
+            "description": "Simple Html Dom Parser for Laravel 4",
+            "keywords": [
+                "HTML Parser",
+                "laravel"
+            ],
+            "time": "2015-03-27 18:51:01"
         }
     ],
     "packages-dev": [
@@ -3094,7 +3134,8 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "barryvdh/laravel-ide-helper": 20
+        "barryvdh/laravel-ide-helper": 20,
+        "yangqi/htmldom": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
