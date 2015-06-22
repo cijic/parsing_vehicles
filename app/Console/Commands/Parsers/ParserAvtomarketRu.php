@@ -19,6 +19,9 @@ class ParserAvtomarketRu extends BaseParser
         $this->pageEncoding = $this->getEncoding($this->domainURL);
     }
 
+    /**
+     * Start parsing.
+     */
     public function parse()
     {
         $modelBrands = new ModelBrand();
@@ -36,7 +39,7 @@ class ParserAvtomarketRu extends BaseParser
             $brand = $brandsURI[$i];
             $subcatalogAnchor = $domainAnchor . $brand->href;
             $subcatalogDOM = $this->generateNeedfulHtmldom($subcatalogAnchor);
-            $brandName = $this->getH1($subcatalogDOM);
+            $brandName = $this->getUnitName($subcatalogDOM);
 
             if ($modelBrands->getStatus($brandName) === 'parsed') {
                 $this->info($brandName . ' skipped');
@@ -65,7 +68,7 @@ class ParserAvtomarketRu extends BaseParser
 
                 $modelAnchor = $domainAnchor . $model->href;
                 $modelCatalogDOM = $this->generateNeedfulHtmldom($modelAnchor);
-                $modelName = $this->getH1($modelCatalogDOM);
+                $modelName = $this->getUnitName($modelCatalogDOM);
                 $this->info('Brand model name: ' . $modelName);
 
                 if ($modelBrandModels->getStatus($modelName) === 'parsed') {
@@ -83,7 +86,7 @@ class ParserAvtomarketRu extends BaseParser
                     $subModel = $modelsCatalogURI[$k];
                     $modificationAnchor = $domainAnchor . $subModel->href;
                     $modificationDOM = $this->generateNeedfulHtmldom($modificationAnchor);
-                    $submodelName = $this->getH1($modificationDOM);
+                    $submodelName = $this->getUnitName($modificationDOM);
                     $this->info('Submodel name: ' . $submodelName);
                     $foundModificationDOM = $modificationDOM->find('.cont .form strong a');
 
@@ -113,14 +116,16 @@ class ParserAvtomarketRu extends BaseParser
         }
     }
 
-    protected function getH1(Htmldom $dom, $convert = true)
+    /**
+     * Get name of the current unit: brand, model, modification, etc.
+     *
+     * @param Htmldom $dom : DOM for parse.
+     * @return string : Name of current unit.
+     */
+    protected function getUnitName(Htmldom $dom)
     {
         $name = $dom->find('h1', 0)->plaintext;
-
-        if ($convert) {
-            $name = $this->toUTF8($name);
-        }
-
+        $name = $this->toUTF8($name);
         $name = str_replace('Характеристики ', '', $name);
         $name = str_replace('&ndash;', '–', $name);
         return $name;
