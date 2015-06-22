@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Parsers;
+namespace App\Console\Commands\Parsers;
 
 use Illuminate\Console\Command;
 use Yangqi\Htmldom\Htmldom;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Parsers;
+namespace App\Console\Commands\Parsers;
 
 use App\Models\ModelBrand;
 use App\Models\ModelBrandModel;
@@ -10,12 +10,12 @@ use App\Models\ModelPropertiesNames;
 use App\Models\ModelPropertiesTypes;
 use Yangqi\Htmldom\Htmldom;
 
-class ParserAvtomarketRu extends BaseParser
+class ParserAutobanBy extends BaseParser
 {
     public function __construct()
     {
-        $this->domainURL = 'http://avtomarket.ru';
-        $this->catalogURL = $this->domainURL . '/catalog';
+        $this->domainURL = 'http://www.autoban.by/';
+        $this->catalogURL = $this->domainURL . '/catalog/car';
         $this->pageEncoding = $this->getEncoding($this->domainURL);
     }
 
@@ -26,17 +26,17 @@ class ParserAvtomarketRu extends BaseParser
 
         $domainAnchor = $this->domainURL;
         $carBrandAnchor = $this->catalogURL;
-        $carBrandDOM = new Htmldom($carBrandAnchor);
+        $carBrandDOM = $this->generateNeedfulHtmldom($carBrandAnchor);
 
         // Find all links for subcatalogs.
-        $brandsURI = $carBrandDOM->find('.cont .form a');
+        $brandsURI = $carBrandDOM->find('.catalog-tabs li.catalog-tabs-item-list__item a');
         $brandSize = count($brandsURI);
 
         for ($i = 0; $i < $brandSize; $i++) {
             $brand = $brandsURI[$i];
             $subcatalogAnchor = $domainAnchor . $brand->href;
             $subcatalogDOM = $this->generateNeedfulHtmldom($subcatalogAnchor);
-            $brandName = $this->getH1($subcatalogDOM);
+            $brandName = $subcatalogDOM->find('.model-logo__item-title-main')[0]->plaintext;
 
             if ($modelBrands->getStatus($brandName) === 'parsed') {
                 $this->info($brandName . ' skipped');
@@ -47,25 +47,15 @@ class ParserAvtomarketRu extends BaseParser
             $modelBrands->insert($brandName, 'expected');
             $brandID = $modelBrands->getID($brandName);
 
-            $subcatalogsURI = $subcatalogDOM->find('.cont .form a');
+            $subcatalogsURI = $subcatalogDOM->find('.car-model__list li.car-model__item a');
             $subcatalogsSize = count($subcatalogsURI);
 
             for ($j = 0; $j < $subcatalogsSize; $j++) {
                 $model = $subcatalogsURI[$j];
-                $this->info('Model URI: ' . $model->href);
-
-                // Because of different errors: indefinetily redirect, 404, etc.;
-                $toSkip = [];
-                $toSkip[] = '/catalog/Toyota/BB/';
-
-                if (in_array($model->href, $toSkip, true)) {
-                    $this->info('Excluding model: ' . $model->href);
-                    continue;
-                }
 
                 $modelAnchor = $domainAnchor . $model->href;
                 $modelCatalogDOM = $this->generateNeedfulHtmldom($modelAnchor);
-                $modelName = $this->getH1($modelCatalogDOM);
+                $modelName = $modelCatalogDOM->find('.model-logo__item-title-main')[0]->plaintext;
                 $this->info('Brand model name: ' . $modelName);
 
                 if ($modelBrandModels->getStatus($modelName) === 'parsed') {
@@ -76,16 +66,14 @@ class ParserAvtomarketRu extends BaseParser
                 $modelBrandModels->insert($brandID, $modelName, 'expected');
                 $brandModelID = $modelBrandModels->getID($brandID, $modelName);
 
-                $modelsCatalogURI = $modelCatalogDOM->find('.cont strong a');
+                $modelsCatalogURI = $modelCatalogDOM->find('h3 a');
                 $modelsCatalogSize = count($modelsCatalogURI);
 
                 for ($k = 0; $k < $modelsCatalogSize; $k++) {
                     $subModel = $modelsCatalogURI[$k];
                     $modificationAnchor = $domainAnchor . $subModel->href;
                     $modificationDOM = $this->generateNeedfulHtmldom($modificationAnchor);
-                    $submodelName = $this->getH1($modificationDOM);
-                    $this->info('Submodel name: ' . $submodelName);
-                    $foundModificationDOM = $modificationDOM->find('.cont .form strong a');
+                    $foundModificationDOM = $modificationDOM->find('.left a.real_link');
 
                     if (!count($foundModificationDOM)) {
                         $data = [];
@@ -113,19 +101,6 @@ class ParserAvtomarketRu extends BaseParser
         }
     }
 
-    protected function getH1(Htmldom $dom, $convert = true)
-    {
-        $name = $dom->find('h1', 0)->plaintext;
-
-        if ($convert) {
-            $name = $this->toUTF8($name);
-        }
-
-        $name = str_replace('Характеристики ', '', $name);
-        $name = str_replace('&ndash;', '–', $name);
-        return $name;
-    }
-
     protected function parseModificationDirect(
         $modification,
         $domainAnchor,
@@ -139,7 +114,6 @@ class ParserAvtomarketRu extends BaseParser
         $modificationInfoAnchor = $domainAnchor . $modification->href;
         $modificationInfoDOM = $this->generateNeedfulHtmldom($modificationInfoAnchor);
         $modificationName = $modificationInfoDOM->find('h1', 0)->plaintext;
-        $modificationName = $this->toUTF8($modificationName);
 
         $modificationName = str_replace('Характеристики ', '', $modificationName);
         $modificationName = str_replace('&ndash;', '–', $modificationName);
@@ -158,8 +132,8 @@ class ParserAvtomarketRu extends BaseParser
             'expected',
             $brandModelID);
 
-        $types = $modificationInfoDOM->find('.cont .form h4');
-        $typeNames = $modificationInfoDOM->find('.cont .form table');
+        $types = $modificationInfoDOM->find('.oh strong');
+        $typeNames = $modificationInfoDOM->find('table.char-item__table');
 
         $sizeTypes = count($types);
         $sizeTypeNames = count($typeNames);
@@ -168,8 +142,9 @@ class ParserAvtomarketRu extends BaseParser
             $data = [];
 
             for ($i = 0; $i < $sizeTypeNames; $i++) {
-                $modificationType = $this->toUTF8($types[$i]->plaintext);
+                $modificationType = $types[$i]->plaintext;
                 $modelPropertiesTypes->insert($modificationType);
+
                 $tableDOM = new Htmldom($typeNames[$i]->innertext);
                 $foundInTable = $tableDOM->find('td');
                 $tableSize = count($foundInTable);
@@ -177,16 +152,11 @@ class ParserAvtomarketRu extends BaseParser
 
                 for ($j = 0; $j < $tableSize; $j += 2) {
                     $key = $foundInTable[$j]->plaintext;
-                    $key = $this->toUTF8($key);
                     $key = str_replace(':', '', $key);
-
                     $typeID = $modelPropertiesTypes->getID($modificationType);
                     $modelPropertiesNames->insert($key, $typeID);
                     $propertyNameID = $modelPropertiesNames->getID($key);
-
                     $value = $foundInTable[$j + 1]->plaintext;
-                    $value = $this->toUTF8($value);
-
                     $newRow['names_id'] = $propertyNameID;
                     $newRow['modification_id'] = $modificationID;
                     $newRow['value'] = $value;

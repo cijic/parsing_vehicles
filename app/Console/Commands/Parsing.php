@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Parsers\ParserAutobanBy;
-use App\Http\Parsers\ParserAvtomarketRu;
+use App\Console\Commands\Parsers\ParserAutobanBy;
+use App\Console\Commands\Parsers\ParserAvtomarketRu;
 use Illuminate\Console\Command;
 
 class Parsing extends Command
