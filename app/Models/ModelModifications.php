@@ -1,4 +1,6 @@
-<?php namespace App\Models;
+<?php
+
+namespace App\Models;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
@@ -15,20 +17,28 @@ class ModelModifications extends Model
                 status_id,
                 url,
                 name,
-                brand_model_id)
+                brand_model_id,
+                created_at,
+                updated_at
+            )
             VALUES (
-              (SELECT id
-               FROM status
-               WHERE name = "' . $status . '"),
-              :url,
-              :name,
-              :brand_model_id)
+                (SELECT id
+                FROM status
+                WHERE name = "' . $status . '"),
+                :url,
+                :name,
+                :brand_model_id,
+                :created_at,
+                :updated_at
+            )
             ';
 
         DB::insert($insertSQL, [
             'url' => $url,
             'name' => $name,
-            'brand_model_id' => $brandModelID
+            'brand_model_id' => $brandModelID,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
         ]);
     }
 
@@ -49,12 +59,14 @@ class ModelModifications extends Model
                     SELECT id
                     FROM status
                     WHERE name = "' . $status . '"
-                )
+                ),
+                updated_at = :updated_at
             WHERE url = :url
             ';
 
         DB::update($updateSQL, [
-            'url' => $url
+            'url' => $url,
+            'updated_at' => date('Y-m-d H:i:s')
         ]);
     }
 

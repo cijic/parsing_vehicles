@@ -1,4 +1,6 @@
-<?php namespace App\Models;
+<?php
+
+namespace App\Models;
 
 use DB;
 use Illuminate\Database\Eloquent\Model;
@@ -8,22 +10,36 @@ class ModelBrandModel extends Model
     public $timestamps = false;
     protected $table = 'brand_model';
 
+    /**
+     * @param $brandID
+     * @param $name
+     * @param $status
+     */
     public function insert($brandID, $name, $status)
     {
         $insertSQL = '
-            INSERT IGNORE INTO ' . $this->table . ' (brand_id, name, status_id)
+            INSERT IGNORE INTO ' . $this->table . ' (
+                brand_id,
+                name,
+                status_id,
+                created_at,
+                updated_at)
             VALUES (
                 :brand_id,
                 :name,
                 (SELECT id
                  FROM status
-                 WHERE name = "' . $status . '")
+                 WHERE name = "' . $status . '"),
+                :created_at,
+                :updated_at
                    )
             ';
 
         DB::insert($insertSQL, [
             'brand_id' => $brandID,
-            'name' => $name
+            'name' => $name,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
         ]);
     }
 
@@ -45,12 +61,14 @@ class ModelBrandModel extends Model
                     SELECT id
                     FROM status
                     WHERE name = "' . $status . '"
-                )
+                ),
+                updated_at = :updated_at
             WHERE name = :name
             ';
 
         DB::update($updateSQL, [
-            'name' => $name
+            'name' => $name,
+            'updated_at' => date('Y-m-d H:i:s')
         ]);
     }
 

@@ -1,7 +1,9 @@
-<?php namespace App\Models;
+<?php
 
-use Illuminate\Database\Eloquent\Model;
+namespace App\Models;
+
 use DB;
+use Illuminate\Database\Eloquent\Model;
 
 class ModelPropertiesTypes extends Model
 {
@@ -11,12 +13,22 @@ class ModelPropertiesTypes extends Model
     public function insert($name)
     {
         $insertSQL = '
-            INSERT IGNORE INTO properties_types (name)
-            VALUES (:name)
+            INSERT IGNORE INTO properties_types (
+                name,
+                created_at,
+                updated_at
+            )
+            VALUES (
+                :name,
+                :created_at,
+                :updated_at
+            )
             ';
 
         DB::insert($insertSQL, [
-            'name' => $name
+            'name' => $name,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
         ]);
     }
 
