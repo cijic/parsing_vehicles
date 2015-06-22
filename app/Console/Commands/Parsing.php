@@ -36,6 +36,8 @@ class Parsing extends Command
      */
     public function handle()
     {
-        //
+        $this->info('Starting parsing ' . $this->argument('service') . '...');
+
+        $this->info('Ended parsing of ' . $this->argument('service') . '.');
     }
 }
