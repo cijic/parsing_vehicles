@@ -11,7 +11,7 @@ class Parsing extends Command
      *
      * @var string
      */
-    protected $signature = 'parsing:auto {service}';
+    protected $signature = 'parsing:auto {--service=avtomarket.ru}';
 
     /**
      * The console command description.
@@ -36,8 +36,8 @@ class Parsing extends Command
      */
     public function handle()
     {
-        $this->info('Starting parsing ' . $this->argument('service') . '...');
+        $this->info('Starting parsing ' . $this->option('service') . '...');
 
-        $this->info('Ended parsing of ' . $this->argument('service') . '.');
+        $this->info('Ended parsing of ' . $this->option('service') . '.');
     }
 }
