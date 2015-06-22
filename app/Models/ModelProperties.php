@@ -11,7 +11,7 @@ class ModelProperties extends Model
     public function insert($data)
     {
         $insertSQL = '
-            INSERT IGNORE INTO ' . $this->table . ' (names_id, modification_id, value)
+            INSERT IGNORE INTO ' . $this->table . ' (names_id, modification_id, value, created_at, updated_at)
             VALUES ';
 
         $size = count($data);
@@ -20,7 +20,9 @@ class ModelProperties extends Model
             $insertSQL .= '('
                 . '"' . $data[$i]['names_id'] . '"' . ','
                 . '"' . $data[$i]['modification_id'] . '"' . ','
-                . '"' . addslashes($data[$i]['value']) . '"' .
+                . '"' . addslashes($data[$i]['value']) . '"' . ','
+                . '"' . date('Y-m-d H:i:s') . '"' . ','
+                . '"' . date('Y-m-d H:i:s') . '"' .
                 ')';
 
             if ($i < (count($data) - 1)) {

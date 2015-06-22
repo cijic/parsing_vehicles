@@ -48,7 +48,7 @@ abstract class BaseParser extends Command
 
     protected function toUTF8($text)
     {
-        return iconv($this->pageEncoding, 'utf-8', $text);
+        return trim(iconv($this->pageEncoding, 'utf-8', $text));
     }
 
     protected function generateNeedfulHtmldom($source)
