@@ -8,29 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class ModelPropertiesNames extends Model
 {
     protected $table = 'properties_names';
+    protected $fillable = ['name', 'type_id'];
 
     public function insert($name, $typeID)
     {
-        $insertSQL = '
-            INSERT IGNORE INTO properties_names (
-                type_id,
-                name,
-                created_at,
-                updated_at
-            )
-            VALUES (
-                :type_id,
-                :name,
-                :created_at,
-                :updated_at
-            )
-            ';
-
-        DB::insert($insertSQL, [
+        self::firstOrCreate([
             'name' => $name,
-            'type_id' => $typeID,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
+            'type_id' => $typeID
         ]);
     }
 
