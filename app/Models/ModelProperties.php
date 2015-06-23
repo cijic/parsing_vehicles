@@ -5,7 +5,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ModelProperties extends Model
 {
-    public $timestamps = false;
     protected $table = 'properties';
 
     public function insert($data)

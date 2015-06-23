@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class ModelPropertiesTypes extends Model
 {
     protected $table = 'properties_types';
-    public $timestamps = false;
 
     public function insert($name)
     {

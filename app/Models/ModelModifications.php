@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ModelModifications extends Model
 {
-    public $timestamps = false;
     protected $table = 'modifications';
 
     public function insert($url, $name, $status, $brandModelID)
