@@ -12,6 +12,7 @@ class ModelBrand extends Model
 
     /**
      * Add new brand in DB.
+     *
      * @param $name : Brand name.
      * @param $status : Brand status.
      */
@@ -27,6 +28,7 @@ class ModelBrand extends Model
 
     /**
      * Get ID of brand.
+     *
      * @param $name : Brand name.
      * @return mixed : ID.
      */
