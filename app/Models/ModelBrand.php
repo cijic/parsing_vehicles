@@ -17,29 +17,11 @@ class ModelBrand extends Model
      */
     public function insert($name, $status)
     {
-        $insertSQL = '
-            INSERT IGNORE INTO ' . $this->table . ' (
-                status_id,
-                name,
-                created_at,
-                updated_at
-            )
-            VALUES (
-                (
-                 SELECT id
-                 FROM status
-                 WHERE name = "' . $status . '"
-                ),
-                :name,
-                :created_at,
-                :updated_at
-            )
-            ';
-
-        DB::insert($insertSQL, [
-            'name' => $name,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
+        $modelStatus = new ModelStatus();
+        $statusID = $modelStatus->getID($status);
+        self::firstOrCreate([
+            'status_id' => $statusID,
+            'name' => $name
         ]);
     }
 
