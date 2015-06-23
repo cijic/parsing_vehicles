@@ -9,6 +9,7 @@ class ModelBrand extends Model
 {
     public $timestamps = false;
     protected $table = 'brand';
+    protected $fillable = ['status_id', 'name'];
 
     /**
      * Add new brand in DB.

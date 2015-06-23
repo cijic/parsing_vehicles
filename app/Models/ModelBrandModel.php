@@ -9,37 +9,23 @@ class ModelBrandModel extends Model
 {
     public $timestamps = false;
     protected $table = 'brand_model';
+    protected $fillable = ['brand_id', 'status_id', 'name'];
 
     /**
-     * @param $brandID
-     * @param $name
-     * @param $status
+     * Add new record.
+     *
+     * @param int $brandID : Brand ID.
+     * @param string $name : Brand model name.
+     * @param string $status : Status name.
      */
     public function insert($brandID, $name, $status)
     {
-        $insertSQL = '
-            INSERT IGNORE INTO ' . $this->table . ' (
-                brand_id,
-                name,
-                status_id,
-                created_at,
-                updated_at)
-            VALUES (
-                :brand_id,
-                :name,
-                (SELECT id
-                 FROM status
-                 WHERE name = "' . $status . '"),
-                :created_at,
-                :updated_at
-                   )
-            ';
-
-        DB::insert($insertSQL, [
+        $modelStatus = new ModelStatus();
+        $statusID = $modelStatus->getID($status);
+        self::firstOrCreate([
             'brand_id' => $brandID,
-            'name' => $name,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s')
+            'status_id' => $statusID,
+            'name' => $name
         ]);
     }
 
