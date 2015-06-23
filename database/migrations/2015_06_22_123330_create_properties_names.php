@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreatePropertiesNames extends Migration
 {
@@ -16,7 +16,8 @@ class CreatePropertiesNames extends Migration
             $table->increments('id');
             $table->integer('type_id')->unsigned();
             $table->foreign('type_id')->references('id')->on('properties_types')->onDelete('cascade');
-            $table->string('name')->unique();
+            $table->string('name');
+            $table->unique(['type_id', 'name']);
             $table->timestamps();
         });
     }

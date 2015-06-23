@@ -142,11 +142,8 @@ class ParserAvtomarketRu extends BaseParser
         $modelPropertiesNames = new ModelPropertiesNames();
         $modificationInfoAnchor = $domainAnchor . $modification->href;
         $modificationInfoDOM = $this->generateNeedfulHtmldom($modificationInfoAnchor);
-        $modificationName = trim($modificationInfoDOM->find('h1', 0)->plaintext);
-        $modificationName = $this->toUTF8($modificationName);
-        $modificationName = str_replace('Характеристики ', '', $modificationName);
-        $modificationName = str_replace('&ndash;', '–', $modificationName);
-        $modificationName = str_replace('&hellip;', '…', $modificationName);
+        $modificationName = $this->handleModificationName($this->toUTF8($modificationInfoDOM->find('h1',
+            0)->plaintext));
 
         if ($modelModifications->getStatus($modificationInfoAnchor) === 'parsed') {
             $this->info($modificationName . ' skipped.');

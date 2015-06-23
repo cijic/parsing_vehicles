@@ -17,7 +17,7 @@ abstract class BaseParser implements IParser
             return;
         }
 
-        echo ($message . PHP_EOL);
+        echo($message . PHP_EOL);
     }
 
     protected function downloadWithCURL($url)
@@ -81,6 +81,21 @@ abstract class BaseParser implements IParser
         }
 
         $this->parseModificationDirect($modification, $domainAnchor, $brandModelID);
+    }
+
+    protected function handleName($name)
+    {
+        $name = trim($name);
+        return $name;
+    }
+
+    protected function handleModificationName($name)
+    {
+        $name = $this->handleName($name);
+        $name = str_replace('Характеристики ', '', $name);
+        $name = str_replace('&ndash;', '–', $name);
+        $name = str_replace('&hellip;', '…', $name);
+        return $name;
     }
 
     abstract protected function parseModificationDirect($modification, $domainAnchor, $brandModelID);
