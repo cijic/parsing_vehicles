@@ -21,9 +21,6 @@ class ParserAutobanBy extends BaseParser
 
     public function parse()
     {
-        $modelBrands = new ModelBrand();
-        $modelBrandModels = new ModelBrandModel();
-
         $domainAnchor = $this->domainURL;
         $carBrandAnchor = $this->catalogURL;
         $carBrandDOM = $this->generateNeedfulHtmldom($carBrandAnchor);
@@ -36,7 +33,8 @@ class ParserAutobanBy extends BaseParser
             $brand = $brandsURI[$i];
             $subcatalogAnchor = $domainAnchor . $brand->href;
             $subcatalogDOM = $this->generateNeedfulHtmldom($subcatalogAnchor);
-            $brandName = $subcatalogDOM->find('.model-logo__item-title-main')[0]->plaintext;
+            $brandName = trim($subcatalogDOM->find('.model-logo__item-title-main')[0]->plaintext);
+            $modelBrands = new ModelBrand();
 
             if ($modelBrands->getStatus($brandName) === 'parsed') {
                 $this->info($brandName . ' skipped');
@@ -55,8 +53,9 @@ class ParserAutobanBy extends BaseParser
 
                 $modelAnchor = $domainAnchor . $model->href;
                 $modelCatalogDOM = $this->generateNeedfulHtmldom($modelAnchor);
-                $modelName = $modelCatalogDOM->find('.model-logo__item-title-main')[0]->plaintext;
+                $modelName = trim($modelCatalogDOM->find('.model-logo__item-title-main')[0]->plaintext);
                 $this->info('Brand model name: ' . $modelName);
+                $modelBrandModels = new ModelBrandModel();
 
                 if ($modelBrandModels->getStatus($modelName) === 'parsed') {
                     $this->info($modelName . ' skipped');
@@ -110,11 +109,10 @@ class ParserAutobanBy extends BaseParser
         $modelProperties = new ModelProperties();
         $modelPropertiesTypes = new ModelPropertiesTypes();
         $modelPropertiesNames = new ModelPropertiesNames();
-//        $modificationRelativeURL = $modification->href;
         $modificationInfoAnchor = $domainAnchor . $modification->href;
         $modificationInfoDOM = $this->generateNeedfulHtmldom($modificationInfoAnchor);
-        $modificationName = $modificationInfoDOM->find('h1', 0)->plaintext;
 
+        $modificationName = trim($modificationInfoDOM->find('h1', 0)->plaintext);
         $modificationName = str_replace('Характеристики ', '', $modificationName);
         $modificationName = str_replace('&ndash;', '–', $modificationName);
         $modificationName = str_replace('&hellip;', '…', $modificationName);
@@ -142,7 +140,7 @@ class ParserAutobanBy extends BaseParser
             $data = [];
 
             for ($i = 0; $i < $sizeTypeNames; $i++) {
-                $modificationType = $types[$i]->plaintext;
+                $modificationType = trim($types[$i]->plaintext);
                 $modelPropertiesTypes->insert($modificationType);
 
                 $tableDOM = new Htmldom($typeNames[$i]->innertext);
@@ -151,12 +149,12 @@ class ParserAutobanBy extends BaseParser
                 $modificationID = $modelModifications->getID($modificationInfoAnchor);
 
                 for ($j = 0; $j < $tableSize; $j += 2) {
-                    $key = $foundInTable[$j]->plaintext;
+                    $key = trim($foundInTable[$j]->plaintext);
                     $key = str_replace(':', '', $key);
                     $typeID = $modelPropertiesTypes->getID($modificationType);
                     $modelPropertiesNames->insert($key, $typeID);
                     $propertyNameID = $modelPropertiesNames->getID($key);
-                    $value = $foundInTable[$j + 1]->plaintext;
+                    $value = trim($foundInTable[$j + 1]->plaintext);
                     $newRow['names_id'] = $propertyNameID;
                     $newRow['modification_id'] = $modificationID;
                     $newRow['value'] = $value;

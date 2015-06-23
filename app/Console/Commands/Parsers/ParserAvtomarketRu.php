@@ -24,9 +24,6 @@ class ParserAvtomarketRu extends BaseParser
      */
     public function parse()
     {
-        $modelBrands = new ModelBrand();
-        $modelBrandModels = new ModelBrandModel();
-
         $domainAnchor = $this->domainURL;
         $carBrandAnchor = $this->catalogURL;
         $carBrandDOM = new Htmldom($carBrandAnchor);
@@ -40,6 +37,8 @@ class ParserAvtomarketRu extends BaseParser
             $subcatalogAnchor = $domainAnchor . $brand->href;
             $subcatalogDOM = $this->generateNeedfulHtmldom($subcatalogAnchor);
             $brandName = $this->getUnitName($subcatalogDOM);
+
+            $modelBrands = new ModelBrand();
 
             if ($modelBrands->getStatus($brandName) === 'parsed') {
                 $this->info($brandName . ' skipped');
@@ -70,6 +69,7 @@ class ParserAvtomarketRu extends BaseParser
                 $modelCatalogDOM = $this->generateNeedfulHtmldom($modelAnchor);
                 $modelName = $this->getUnitName($modelCatalogDOM);
                 $this->info('Brand model name: ' . $modelName);
+                $modelBrandModels = new ModelBrandModel();
 
                 if ($modelBrandModels->getStatus($modelName) === 'parsed') {
                     $this->info($modelName . ' skipped');
@@ -124,7 +124,7 @@ class ParserAvtomarketRu extends BaseParser
      */
     protected function getUnitName(Htmldom $dom)
     {
-        $name = $dom->find('h1', 0)->plaintext;
+        $name = trim($dom->find('h1', 0)->plaintext);
         $name = $this->toUTF8($name);
         $name = str_replace('Характеристики ', '', $name);
         $name = str_replace('&ndash;', '–', $name);
@@ -140,12 +140,10 @@ class ParserAvtomarketRu extends BaseParser
         $modelProperties = new ModelProperties();
         $modelPropertiesTypes = new ModelPropertiesTypes();
         $modelPropertiesNames = new ModelPropertiesNames();
-//        $modificationRelativeURL = $modification->href;
         $modificationInfoAnchor = $domainAnchor . $modification->href;
         $modificationInfoDOM = $this->generateNeedfulHtmldom($modificationInfoAnchor);
-        $modificationName = $modificationInfoDOM->find('h1', 0)->plaintext;
+        $modificationName = trim($modificationInfoDOM->find('h1', 0)->plaintext);
         $modificationName = $this->toUTF8($modificationName);
-
         $modificationName = str_replace('Характеристики ', '', $modificationName);
         $modificationName = str_replace('&ndash;', '–', $modificationName);
         $modificationName = str_replace('&hellip;', '…', $modificationName);
@@ -181,7 +179,7 @@ class ParserAvtomarketRu extends BaseParser
                 $modificationID = $modelModifications->getID($modificationInfoAnchor);
 
                 for ($j = 0; $j < $tableSize; $j += 2) {
-                    $key = $foundInTable[$j]->plaintext;
+                    $key = trim($foundInTable[$j]->plaintext);
                     $key = $this->toUTF8($key);
                     $key = str_replace(':', '', $key);
 
@@ -189,7 +187,7 @@ class ParserAvtomarketRu extends BaseParser
                     $modelPropertiesNames->insert($key, $typeID);
                     $propertyNameID = $modelPropertiesNames->getID($key);
 
-                    $value = $foundInTable[$j + 1]->plaintext;
+                    $value = trim($foundInTable[$j + 1]->plaintext);
                     $value = $this->toUTF8($value);
 
                     $newRow['names_id'] = $propertyNameID;
