@@ -2,10 +2,9 @@
 
 namespace App\Console\Commands\Parsers;
 
-use Illuminate\Console\Command;
 use Yangqi\Htmldom\Htmldom;
 
-abstract class BaseParser extends Command
+abstract class BaseParser implements IParser
 {
     protected $domainURL;
     protected $catalogURL;
@@ -83,12 +82,6 @@ abstract class BaseParser extends Command
 
         $this->parseModificationDirect($modification, $domainAnchor, $brandModelID);
     }
-
-    /**
-     * Parse source for data.
-     * @return void
-     */
-    abstract public function parse();
 
     abstract protected function parseModificationDirect($modification, $domainAnchor, $brandModelID);
 }
