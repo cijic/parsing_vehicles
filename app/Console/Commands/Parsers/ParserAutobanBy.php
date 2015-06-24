@@ -9,6 +9,7 @@ use App\Models\ModelProperties;
 use App\Models\ModelPropertiesNames;
 use App\Models\ModelPropertiesTypes;
 use Yangqi\Htmldom\Htmldom;
+use Yangqi\Htmldom\Htmldomnode;
 
 class ParserAutobanBy extends BaseParser
 {
@@ -19,11 +20,12 @@ class ParserAutobanBy extends BaseParser
         $this->pageEncoding = $this->getEncoding($this->domainURL);
     }
 
+    /**
+     * Start parsing.
+     */
     public function parse()
     {
-        $domainAnchor = $this->domainURL;
-        $carBrandAnchor = $this->catalogURL;
-        $carBrandDOM = $this->generateNeedfulHtmldom($carBrandAnchor);
+        $carBrandDOM = $this->generateNeedfulHtmldom($this->catalogURL);
 
         // Find all links for subcatalogs.
         $brandsURI = $carBrandDOM->find('.catalog-tabs li.catalog-tabs-item-list__item a');
@@ -31,7 +33,7 @@ class ParserAutobanBy extends BaseParser
 
         for ($i = 0; $i < $brandSize; $i++) {
             $brand = $brandsURI[$i];
-            $subcatalogAnchor = $domainAnchor . $brand->href;
+            $subcatalogAnchor = $this->domainURL . $brand->href;
             $subcatalogDOM = $this->generateNeedfulHtmldom($subcatalogAnchor);
             $brandName = trim($subcatalogDOM->find('.model-logo__item-title-main')[0]->plaintext);
             $modelBrands = new ModelBrand();
@@ -51,7 +53,7 @@ class ParserAutobanBy extends BaseParser
             for ($j = 0; $j < $subcatalogsSize; $j++) {
                 $model = $subcatalogsURI[$j];
 
-                $modelAnchor = $domainAnchor . $model->href;
+                $modelAnchor = $this->domainURL . $model->href;
                 $modelCatalogDOM = $this->generateNeedfulHtmldom($modelAnchor);
                 $modelName = trim($modelCatalogDOM->find('.model-logo__item-title-main')[0]->plaintext);
                 $this->info('Brand model name: ' . $modelName);
@@ -70,21 +72,19 @@ class ParserAutobanBy extends BaseParser
 
                 for ($k = 0; $k < $modelsCatalogSize; $k++) {
                     $subModel = $modelsCatalogURI[$k];
-                    $modificationAnchor = $domainAnchor . $subModel->href;
+                    $modificationAnchor = $this->domainURL . $subModel->href;
                     $modificationDOM = $this->generateNeedfulHtmldom($modificationAnchor);
                     $foundModificationDOM = $modificationDOM->find('.left a.real_link');
 
                     if (!count($foundModificationDOM)) {
                         $data = [];
                         $data['modification'] = $subModel;
-                        $data['domainAnchor'] = $domainAnchor;
                         $data['brandModelID'] = $brandModelID;
                         $this->parseModification($data);
                     } else {
                         foreach ($foundModificationDOM as $modification) {
                             $data = [];
                             $data['modification'] = $modification;
-                            $data['domainAnchor'] = $domainAnchor;
                             $data['brandModelID'] = $brandModelID;
                             $this->parseModification($data);
                         }
@@ -100,18 +100,18 @@ class ParserAutobanBy extends BaseParser
         }
     }
 
-    protected function parseModificationDirect(
-        $modification,
-        $domainAnchor,
-        $brandModelID
-    ) {
-        $modelModifications = new ModelModifications();
-        $modelProperties = new ModelProperties();
-        $modelPropertiesTypes = new ModelPropertiesTypes();
-        $modelPropertiesNames = new ModelPropertiesNames();
-        $modificationInfoAnchor = $domainAnchor . $modification->href;
+    /**
+     * Parse DOM of specified modication.
+     *
+     * @param Htmldomnode $modification : DOM of modification.
+     * @param int $brandModelID : Brand model ID.
+     */
+    protected function parseModificationDirect(Htmldomnode $modification, $brandModelID)
+    {
+        $modificationInfoAnchor = $this->domainURL . $modification->href;
         $modificationInfoDOM = $this->generateNeedfulHtmldom($modificationInfoAnchor);
         $modificationName = $this->handleModificationName($modificationInfoDOM->find('h1', 0)->plaintext);
+        $modelModifications = new ModelModifications();
 
         if ($modelModifications->getStatus($modificationInfoAnchor) === 'parsed') {
             $this->info($modificationName . ' skipped.');
@@ -119,12 +119,7 @@ class ParserAutobanBy extends BaseParser
         }
 
         $this->info('Parsing model modification: ' . $modificationName . '...');
-
-        $modelModifications->insert(
-            $modificationInfoAnchor,
-            $modificationName,
-            'expected',
-            $brandModelID);
+        $modelModifications->insert($modificationInfoAnchor, $modificationName, 'expected', $brandModelID);
 
         $types = $modificationInfoDOM->find('.oh strong');
         $typeNames = $modificationInfoDOM->find('table.char-item__table');
@@ -133,11 +128,14 @@ class ParserAutobanBy extends BaseParser
         $sizeTypeNames = count($typeNames);
 
         if ($sizeTypes && $sizeTypes === $sizeTypeNames) {
+            $modelProperties = new ModelProperties();
             $data = [];
 
             for ($i = 0; $i < $sizeTypeNames; $i++) {
                 $modificationType = trim($types[$i]->plaintext);
+                $modelPropertiesTypes = new ModelPropertiesTypes();
                 $modelPropertiesTypes->insert($modificationType);
+                $modelPropertiesNames = new ModelPropertiesNames();
 
                 $tableDOM = new Htmldom($typeNames[$i]->innertext);
                 $foundInTable = $tableDOM->find('td');

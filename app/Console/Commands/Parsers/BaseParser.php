@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Parsers;
 
 use Yangqi\Htmldom\Htmldom;
+use Yangqi\Htmldom\Htmldomnode;
 
 abstract class BaseParser implements IParser
 {
@@ -58,15 +59,10 @@ abstract class BaseParser implements IParser
     protected function parseModification(array $data)
     {
         $modification = null;
-        $domainAnchor = null;
         $brandModelID = null;
 
         if (array_key_exists('modification', $data)) {
             $modification = $data['modification'];
-        }
-
-        if (array_key_exists('domainAnchor', $data)) {
-            $domainAnchor = $data['domainAnchor'];
         }
 
         if (array_key_exists('brandModelID', $data)) {
@@ -74,13 +70,12 @@ abstract class BaseParser implements IParser
         }
 
         if (empty($modification) or
-            empty($domainAnchor) or
             empty($brandModelID)
         ) {
             return;
         }
 
-        $this->parseModificationDirect($modification, $domainAnchor, $brandModelID);
+        $this->parseModificationDirect($modification, $brandModelID);
     }
 
     protected function handleName($name)
@@ -98,5 +93,11 @@ abstract class BaseParser implements IParser
         return $name;
     }
 
-    abstract protected function parseModificationDirect($modification, $domainAnchor, $brandModelID);
+    /**
+     * Parse DOM of specified modication.
+     *
+     * @param Htmldomnode $modification : DOM of modification.
+     * @param int $brandModelID : Brand model ID.
+     */
+    abstract protected function parseModificationDirect(Htmldomnode $modification, $brandModelID);
 }
