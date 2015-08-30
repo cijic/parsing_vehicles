@@ -146,7 +146,8 @@ return [
 
 
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
-        'Yangqi\Htmldom\HtmldomServiceProvider'
+        'Yangqi\Htmldom\HtmldomServiceProvider',
+        'Maatwebsite\Excel\ExcelServiceProvider',
     ],
 
     /*
@@ -196,6 +197,7 @@ return [
         'View'      => Illuminate\Support\Facades\View::class,
 
         'Htmldom'   => 'Yangqi\Htmldom\Htmldom',
+        'Excel'     => 'Maatwebsite\Excel\Facades\Excel',
 
     ],
 

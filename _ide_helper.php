@@ -1,7 +1,7 @@
 <?php
 /**
  * A helper file for Laravel 5, to provide autocomplete information to your IDE
- * Generated for Laravel 5.1.2 (LTS) on 2015-06-22.
+ * Generated for Laravel 5.1.11 (LTS) on 2015-08-30.
  *
  * @author Barry vd. Heuvel <barryvdh@gmail.com>
  * @see https://github.com/barryvdh/laravel-ide-helper
@@ -179,6 +179,27 @@ namespace {
          */
         public static function useStoragePath($path){
             return \Illuminate\Foundation\Application::useStoragePath($path);
+        }
+        
+        /**
+         * Get the path to the environment file directory.
+         *
+         * @return string 
+         * @static 
+         */
+        public static function environmentPath(){
+            return \Illuminate\Foundation\Application::environmentPath();
+        }
+        
+        /**
+         * Set the directory for the environment file.
+         *
+         * @param string $path
+         * @return $this 
+         * @static 
+         */
+        public static function useEnvironmentPath($path){
+            return \Illuminate\Foundation\Application::useEnvironmentPath($path);
         }
         
         /**
@@ -408,6 +429,16 @@ namespace {
          */
         public static function handle($request, $type = 1, $catch = true){
             return \Illuminate\Foundation\Application::handle($request, $type, $catch);
+        }
+        
+        /**
+         * Determine if middleware has been disabled for the application.
+         *
+         * @return bool 
+         * @static 
+         */
+        public static function shouldSkipMiddleware(){
+            return \Illuminate\Foundation\Application::shouldSkipMiddleware();
         }
         
         /**
@@ -731,7 +762,7 @@ namespace {
         /**
          * Register a shared binding in the container.
          *
-         * @param string $abstract
+         * @param string|array $abstract
          * @param \Closure|string|null $concrete
          * @return void 
          * @static 
@@ -1615,6 +1646,16 @@ namespace {
          */
         public static function directive($name, $handler){
             \Illuminate\View\Compilers\BladeCompiler::directive($name, $handler);
+        }
+        
+        /**
+         * Get the list of custom directives.
+         *
+         * @return array 
+         * @static 
+         */
+        public static function getCustomDirectives(){
+            return \Illuminate\View\Compilers\BladeCompiler::getCustomDirectives();
         }
         
         /**
@@ -2811,7 +2852,7 @@ namespace {
          *
          * @param \Closure $callback
          * @return mixed 
-         * @throws \Exception
+         * @throws \Throwable
          * @static 
          */
         public static function transaction($callback){
@@ -2899,6 +2940,17 @@ namespace {
         public static function listen($callback){
             //Method inherited from \Illuminate\Database\Connection            
             \Illuminate\Database\MySqlConnection::listen($callback);
+        }
+        
+        /**
+         * Is Doctrine available?
+         *
+         * @return bool 
+         * @static 
+         */
+        public static function isDoctrineAvailable(){
+            //Method inherited from \Illuminate\Database\Connection            
+            return \Illuminate\Database\MySqlConnection::isDoctrineAvailable();
         }
         
         /**
@@ -3398,11 +3450,13 @@ namespace {
          * @param int $perPage
          * @param array $columns
          * @param string $pageName
+         * @param int|null $page
          * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator 
+         * @throws \InvalidArgumentException
          * @static 
          */
-        public static function paginate($perPage = null, $columns = array(), $pageName = 'page'){
-            return \Illuminate\Database\Eloquent\Builder::paginate($perPage, $columns, $pageName);
+        public static function paginate($perPage = null, $columns = array(), $pageName = 'page', $page = null){
+            return \Illuminate\Database\Eloquent\Builder::paginate($perPage, $columns, $pageName, $page);
         }
         
         /**
@@ -5562,6 +5616,16 @@ namespace {
         }
         
         /**
+         * Determine if the given content types match.
+         *
+         * @return bool 
+         * @static 
+         */
+        public static function matchesType($actual, $type){
+            return \Illuminate\Http\Request::matchesType($actual, $type);
+        }
+        
+        /**
          * Determine if the request is sending JSON.
          *
          * @return bool 
@@ -5590,6 +5654,17 @@ namespace {
          */
         public static function accepts($contentTypes){
             return \Illuminate\Http\Request::accepts($contentTypes);
+        }
+        
+        /**
+         * Return the most suitable content type from the given array based on content negotiation.
+         *
+         * @param string|array $contentTypes
+         * @return string|null 
+         * @static 
+         */
+        public static function prefers($contentTypes){
+            return \Illuminate\Http\Request::prefers($contentTypes);
         }
         
         /**
@@ -5675,11 +5750,12 @@ namespace {
         /**
          * Get the route handling the request.
          *
-         * @return \Illuminate\Routing\Route|null 
+         * @param string|null $param
+         * @return object|string 
          * @static 
          */
-        public static function route(){
-            return \Illuminate\Http\Request::route();
+        public static function route($param = null){
+            return \Illuminate\Http\Request::route($param);
         }
         
         /**
@@ -5780,7 +5856,7 @@ namespace {
          * @param array $cookies The COOKIE parameters
          * @param array $files The FILES parameters
          * @param array $server The SERVER parameters
-         * @param string $content The raw body data
+         * @param string|resource $content The raw body data
          * @api 
          * @static 
          */
@@ -7210,6 +7286,22 @@ namespace {
          * @return mixed 
          * @static 
          */
+        public static function onQueue($queue, $view, $data, $callback){
+            return \Illuminate\Mail\Mailer::onQueue($queue, $view, $data, $callback);
+        }
+        
+        /**
+         * Queue a new e-mail message for sending on the given queue.
+         * 
+         * This method didn't match rest of framework's "onQueue" phrasing. Added "onQueue".
+         *
+         * @param string $queue
+         * @param string|array $view
+         * @param array $data
+         * @param \Closure|string $callback
+         * @return mixed 
+         * @static 
+         */
         public static function queueOn($queue, $view, $data, $callback){
             return \Illuminate\Mail\Mailer::queueOn($queue, $view, $data, $callback);
         }
@@ -7560,7 +7652,7 @@ namespace {
          * @param mixed $data
          * @param string $queue
          * @return mixed 
-         * @throws \Exception
+         * @throws \Throwable
          * @static 
          */
         public static function push($job, $data = '', $queue = null){
@@ -8248,6 +8340,16 @@ namespace {
         }
         
         /**
+         * Determine if the given content types match.
+         *
+         * @return bool 
+         * @static 
+         */
+        public static function matchesType($actual, $type){
+            return \Illuminate\Http\Request::matchesType($actual, $type);
+        }
+        
+        /**
          * Determine if the request is sending JSON.
          *
          * @return bool 
@@ -8276,6 +8378,17 @@ namespace {
          */
         public static function accepts($contentTypes){
             return \Illuminate\Http\Request::accepts($contentTypes);
+        }
+        
+        /**
+         * Return the most suitable content type from the given array based on content negotiation.
+         *
+         * @param string|array $contentTypes
+         * @return string|null 
+         * @static 
+         */
+        public static function prefers($contentTypes){
+            return \Illuminate\Http\Request::prefers($contentTypes);
         }
         
         /**
@@ -8361,11 +8474,12 @@ namespace {
         /**
          * Get the route handling the request.
          *
-         * @return \Illuminate\Routing\Route|null 
+         * @param string|null $param
+         * @return object|string 
          * @static 
          */
-        public static function route(){
-            return \Illuminate\Http\Request::route();
+        public static function route($param = null){
+            return \Illuminate\Http\Request::route($param);
         }
         
         /**
@@ -8466,7 +8580,7 @@ namespace {
          * @param array $cookies The COOKIE parameters
          * @param array $files The FILES parameters
          * @param array $server The SERVER parameters
-         * @param string $content The raw body data
+         * @param string|resource $content The raw body data
          * @api 
          * @static 
          */
@@ -11333,7 +11447,7 @@ namespace {
          * @param string $view
          * @param array $data
          * @param array $mergeData
-         * @return \Illuminate\View\View 
+         * @return \Illuminate\Contracts\View\View 
          * @static 
          */
         public static function make($view, $data = array(), $mergeData = array()){
@@ -11416,13 +11530,13 @@ namespace {
         /**
          * Add a piece of shared data to the environment.
          *
-         * @param string $key
+         * @param array|string $key
          * @param mixed $value
-         * @return void 
+         * @return mixed 
          * @static 
          */
         public static function share($key, $value = null){
-            \Illuminate\View\Factory::share($key, $value);
+            return \Illuminate\View\Factory::share($key, $value);
         }
         
         /**
@@ -11782,6 +11896,136 @@ namespace {
          */
         public static function getNames(){
             return \Illuminate\View\Factory::getNames();
+        }
+        
+    }
+
+
+    class Htmldom extends \Yangqi\Htmldom\Htmldom{
+        
+    }
+
+
+    class Excel extends \Maatwebsite\Excel\Facades\Excel{
+        
+        /**
+         * Create a new file
+         *
+         * @param $filename
+         * @param callable|null $callback
+         * @return \Maatwebsite\Excel\LaravelExcelWriter 
+         * @static 
+         */
+        public static function create($filename, $callback = null){
+            return \Maatwebsite\Excel\Excel::create($filename, $callback);
+        }
+        
+        /**
+         * Load an existing file
+         *
+         * @param string $file The file we want to load
+         * @param callback|null $callback
+         * @param string|null $encoding
+         * @param bool $noBasePath
+         * @return \Maatwebsite\Excel\LaravelExcelReader 
+         * @static 
+         */
+        public static function load($file, $callback = null, $encoding = null, $noBasePath = false){
+            return \Maatwebsite\Excel\Excel::load($file, $callback, $encoding, $noBasePath);
+        }
+        
+        /**
+         * Set select sheets
+         *
+         * @param $sheets
+         * @return \Maatwebsite\Excel\LaravelExcelReader 
+         * @static 
+         */
+        public static function selectSheets($sheets = array()){
+            return \Maatwebsite\Excel\Excel::selectSheets($sheets);
+        }
+        
+        /**
+         * Select sheets by index
+         *
+         * @param array $sheets
+         * @return $this 
+         * @static 
+         */
+        public static function selectSheetsByIndex($sheets = array()){
+            return \Maatwebsite\Excel\Excel::selectSheetsByIndex($sheets);
+        }
+        
+        /**
+         * Batch import
+         *
+         * @param $files
+         * @param callback $callback
+         * @return \Maatwebsite\Excel\PHPExcel 
+         * @static 
+         */
+        public static function batch($files, $callback){
+            return \Maatwebsite\Excel\Excel::batch($files, $callback);
+        }
+        
+        /**
+         * Create a new file and share a view
+         *
+         * @param string $view
+         * @param array $data
+         * @param array $mergeData
+         * @return \Maatwebsite\Excel\LaravelExcelWriter 
+         * @static 
+         */
+        public static function shareView($view, $data = array(), $mergeData = array()){
+            return \Maatwebsite\Excel\Excel::shareView($view, $data, $mergeData);
+        }
+        
+        /**
+         * Create a new file and load a view
+         *
+         * @param string $view
+         * @param array $data
+         * @param array $mergeData
+         * @return \Maatwebsite\Excel\LaravelExcelWriter 
+         * @static 
+         */
+        public static function loadView($view, $data = array(), $mergeData = array()){
+            return \Maatwebsite\Excel\Excel::loadView($view, $data, $mergeData);
+        }
+        
+        /**
+         * Set filters
+         *
+         * @param array $filters
+         * @return \Maatwebsite\Excel\Excel 
+         * @static 
+         */
+        public static function registerFilters($filters = array()){
+            return \Maatwebsite\Excel\Excel::registerFilters($filters);
+        }
+        
+        /**
+         * Enable certain filters
+         *
+         * @param string|array $filter
+         * @param bool|false|string $class
+         * @return \Maatwebsite\Excel\Excel 
+         * @static 
+         */
+        public static function filter($filter, $class = false){
+            return \Maatwebsite\Excel\Excel::filter($filter, $class);
+        }
+        
+        /**
+         * Get register, enabled (or both) filters
+         *
+         * @param string|boolean $key [description]
+         * @return array 
+         * @static 
+         */
+        public static function getFilters($key = false){
+            return \Maatwebsite\Excel\Excel::getFilters($key);
         }
         
     }
